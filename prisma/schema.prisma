@@ -1,13 +1,128 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "sqlite"
+}
+
+model User {
+  id              Int               @id @default(autoincrement())
+  email           String            @unique
+  name            String
+  passwordHash    String            @map("password_hash")
+  createdAt       DateTime          @default(now()) @map("created_at")
+  progress        UserProgress[]
+  exerciseRecords ExerciseRecord[]
+  checkIns        DailyCheckIn[]
+  bookmarks       Bookmark[]
+  reviews         ContentReview[]
+
+  @@map("users")
+}
+
+model Word {
+  id                  Int               @id @default(autoincrement())
+  word                String
+  pronunciation       String
+  meaning             String
+  mnemonic            String
+  exampleSentence     String            @map("example_sentence")
+  exampleTranslation  String            @map("example_translation")
+  level               String            // CET4 | CET6
+  tags                String            @default("[]") // JSON array
+  status              String            @default("draft") // draft | published | rejected
+  createdAt           DateTime          @default(now()) @map("created_at")
+
+  @@map("words")
+}
+
+model Phrase {
+  id                  Int               @id @default(autoincrement())
+  phrase              String
+  meaning             String
+  mnemonic            String
+  exampleSentence     String            @map("example_sentence")
+  exampleTranslation  String            @map("example_translation")
+  level               String
+  tags                String            @default("[]")
+  status              String            @default("draft")
+  createdAt           DateTime          @default(now()) @map("created_at")
+
+  @@map("phrases")
+}
+
+model Passage {
+  id                 Int               @id @default(autoincrement())
+  title              String
+  content            String
+  translation        String
+  highlightedWordIds String            @map("highlighted_word_ids") @default("[]")
+  level              String
+  tags               String            @default("[]")
+  status             String            @default("draft")
+  createdAt          DateTime          @default(now()) @map("created_at")
+
+  @@map("passages")
+}
+
+model UserProgress {
+  id             Int      @id @default(autoincrement())
+  userId         Int      @map("user_id")
+  contentId      Int      @map("content_id")
+  mastery        Int      @default(0) // 0-5
+  lastReviewedAt DateTime @default(now()) @map("last_reviewed_at")
+  nextReviewAt   DateTime @default(now()) @map("next_review_at")
+  correctCount   Int      @default(0) @map("correct_count")
+  incorrectCount Int      @default(0) @map("incorrect_count")
+  user           User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, contentId])
+  @@map("user_progress")
+}
+
+model ExerciseRecord {
+  id           Int      @id @default(autoincrement())
+  userId       Int      @map("user_id")
+  exerciseType String   @map("exercise_type") // flashcard | quiz | spelling
+  contentId    Int      @map("content_id")
+  isCorrect    Boolean  @map("is_correct")
+  answeredAt   DateTime @default(now()) @map("answered_at")
+  user         User     @relation(fields: [userId], references: [id])
+
+  @@map("exercise_records")
+}
+
+model DailyCheckIn {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  date        DateTime
+  streakCount Int      @map("streak_count")
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, date])
+  @@map("daily_checkins")
+}
+
+model Bookmark {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  contentId   Int      @map("content_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, contentId])
+  @@map("bookmarks")
+}
+
+model ContentReview {
+  id           Int       @id @default(autoincrement())
+  contentId    Int       @map("content_id")
+  reviewerId   Int       @map("reviewer_id")
+  status       String    @default("pending") // pending | approved | rejected
+  rejectReason String?   @map("reject_reason")
+  reviewedAt   DateTime? @map("reviewed_at")
+  reviewer     User      @relation(fields: [reviewerId], references: [id])
+
+  @@map("content_reviews")
 }
