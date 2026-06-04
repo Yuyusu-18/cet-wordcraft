@@ -5,7 +5,7 @@ import ContentCard from "@/components/ContentCard";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [recentWords, recentPhrases, recentPassages] = await Promise.all([
+  const [recentWords, , recentPassages] = await Promise.all([
     prisma.word.findMany({
       where: { status: "published" },
       orderBy: { createdAt: "desc" },

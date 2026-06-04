@@ -11,7 +11,7 @@ export async function POST(req: Request) {
   }
 
   const userId = parseInt((session.user as { id: string }).id);
-  const { contentId, contentType, exerciseType, isCorrect } = await req.json();
+  const { contentId, exerciseType, isCorrect } = await req.json();
 
   // Record the exercise
   await prisma.exerciseRecord.create({

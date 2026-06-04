@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ success: true }, { status: 201 });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "服务器错误" }, { status: 500 });
   }
 }

@@ -35,6 +35,7 @@ export async function GET(req: Request) {
     })
   ).map((p) => p.contentId);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let model: any;
   if (contentType === "words") model = prisma.word;
   else model = prisma.phrase;
@@ -58,6 +59,7 @@ export async function GET(req: Request) {
       : [];
 
   // Also get some random published items to fill session
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const existingIds = [...dueIds, ...newItems.map((n: any) => n.id)];
   const fillCount = getSessionSize(100) - dueItems.length - newItems.length;
   const fillItems =
