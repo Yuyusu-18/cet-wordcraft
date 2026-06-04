@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: cet-wordcraft
+    env: node
+    buildCommand: npm install && npx prisma generate && npm run build
+    startCommand: bash start.sh
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXTAUTH_SECRET
+        value: cet-wordcraft-production-secret-key-2026
+      - key: NEXTAUTH_URL
+        sync: false
+    autoDeploy: true
